@@ -11,20 +11,41 @@ inference_time_histogram = Histogram(
     'Temps d\'inférence en secondes'
 )
 
+def track_inference_time(inference_time_ms: float):
+    """Enregistre le temps d'inférence"""
+    inference_time_histogram.observe(inference_time_ms / 1000)
+
 feedback_counter = Counter(
     name='cv_user_feedback_total',
     documentation='Nombre de feedbacks utilisateurs',
     labelnames=['feedback']  # 0 ou 1
 )
 
-def track_inference_time(inference_time_ms: float):
-    """Enregistre le temps d'inférence"""
-    inference_time_histogram.observe(inference_time_ms / 1000)
-
 def track_feedback(feedback_type: int):
     """Incrémente le compteur de feedbacks"""
     if feedback_type in [0, 1]:
         feedback_counter.labels(feedback=feedback_type).inc()
+
+prediction_confidence_histogram = Histogram(
+    'cv_prediction_confidence',
+    'Confiance des prédictions du modèle',
+    buckets=[0, 10.0, 20.2, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100]
+)
+
+def track_confidence(confidence: float):
+    """Enregistre la confiance d'une prédiction"""
+    prediction_confidence_histogram.observe(confidence)
+
+predicted_target_counter = Counter(
+    name='cv_predicted_target_total',
+    documentation='Nombre de prédictions par classe',
+    labelnames=['target']  # 'cat' ou 'dog'
+)
+
+def track_prediction(target: str):
+    """Incrémente le compteur de prédictions par classe"""
+    if target in ['cat', 'dog']:
+        predicted_target_counter.labels(target=target).inc()
 # ─────────────────────────────────────────────────────────────────────────────
 # 📏 GAUGE : Valeur pouvant monter ET descendre (snapshot de l'état actuel)
 # ─────────────────────────────────────────────────────────────────────────────

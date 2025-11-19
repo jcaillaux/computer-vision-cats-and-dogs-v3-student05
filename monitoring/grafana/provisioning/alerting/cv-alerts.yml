@@ -1,27 +1,3 @@
-# ═══════════════════════════════════════════════════════════════════════════════
-# 🚨 GRAFANA ALERT RULES - Règles d'alerting MLOps
-# ═══════════════════════════════════════════════════════════════════════════════
-#
-# 🎯 OBJECTIF
-# Définit les règles d'alerte Grafana Unified Alerting pour monitoring proactif.
-# Format YAML généré par Grafana UI (export), structuré pour provisioning.
-#
-# 📚 CONCEPTS CLÉS
-# - Alert rule : condition + données + seuil + durée
-# - Query (data) : source métriques (Prometheus, SQL, etc.)
-# - Condition (threshold) : évaluation booléenne (>, <, ==)
-# - for : durée avant déclenchement (anti-faux positifs)
-# - noDataState/execErrState : comportement si données manquantes
-#
-# 🔗 WORKFLOW
-# Query Prometheus → Reduce → Threshold → Fire/Resolve → Contact Point (Discord)
-#
-# ⚠️ FORMAT COMPLEXE
-# Ce YAML est verbeux car exporté depuis Grafana UI.
-# Création manuelle difficile → privilégier création UI puis export.
-#
-# ═══════════════════════════════════════════════════════════════════════════════
-
 apiVersion: 1
 
 groups:
@@ -109,9 +85,9 @@ groups:
               expression: A
               type: threshold
         
-        noDataState: NoData
+        noDataState: OK
         execErrState: Error
-        for: 2m
+        for: 1m
         annotations:
           description: "La latence moyenne d'inférence dépasse 2 secondes depuis 2 minutes. Vérifier charge CPU/GPU et modèle."
           summary: "Latence d'inférence élevée (> 2s)"
@@ -119,76 +95,48 @@ groups:
           severity: warning
           component: inference
         isPaused: false
-
-# ═══════════════════════════════════════════════════════════════════════════
-# 🎓 STRUCTURE ALERT RULE GRAFANA
-# ═══════════════════════════════════════════════════════════════════════════
-#
-# PIPELINE D'ÉVALUATION (exemple alerte latence)
-# 1. Query A (Prometheus) : récupère métrique histogram
-# 2. Calcul (PromQL) : rate(sum) / rate(count) → latence moyenne
-# 3. Query B (Reduce) : extrait dernière valeur → scalaire
-# 4. Query C (Threshold) : compare scalaire > seuil → booléen
-# 5. For duration : condition vraie pendant N minutes ?
-# 6. Fire : déclenche notification → contact point (Discord)
-#
-# ÉTATS POSSIBLES
-# - Normal : condition false
-# - Pending : condition true mais <for duration (pas encore notifié)
-# - Firing : condition true depuis >for duration (notification envoyée)
-# - Resolved : était firing, maintenant normal (notification résolution)
-#
-# ═══════════════════════════════════════════════════════════════════════════
-# 🛠️ CRÉATION NOUVELLES ALERTES
-# ═══════════════════════════════════════════════════════════════════════════
-#
-# MÉTHODE RECOMMANDÉE (UI Grafana)
-# 1. Dashboard → panel existant → Edit
-# 2. Tab "Alert" → Create alert rule
-# 3. Configurer condition graphiquement
-# 4. Test avec "Preview" (données réelles)
-# 5. Save
-# 6. Exporter : Alerting → Alert rules → Export as YAML
-# 7. Ajouter à cv-alerts.yml
-#
-# ⚠️ CRÉATION MANUELLE YAML (difficile)
-# Format complexe, queries imbriquées, refIds multiples
-# Privilégier UI → export pour éviter erreurs syntaxe
-#
-# ═══════════════════════════════════════════════════════════════════════════
-# 🔧 TESTS ET DEBUG
-# ═══════════════════════════════════════════════════════════════════════════
-#
-# TEST ALERTE (forcer déclenchement)
-# - DB disconnect : docker compose stop postgres
-# - High latency : surcharger CPU (stress test)
-# - No activity : arrêter frontend/stop prédictions
-#
-# MONITORING ALERTES
-# Grafana UI → Alerting → Alert rules
-# - État : Normal, Pending, Firing
-# - Historique : derniers déclenchements
-# - Silences : désactiver temporairement
-#
-# DEBUG QUERY
-# Grafana UI → Explore → datasource Prometheus
-# - Copier expr depuis cv-alerts.yml
-# - Tester query isolément
-# - Vérifier valeurs retournées
-#
-# LOGS GRAFANA
-# docker compose logs grafana | grep -i alert
-# - "provisioning alert rules"
-# - "alert rule ... is firing"
-# - Erreurs d'évaluation
-#
-# ═══════════════════════════════════════════════════════════════════════════
-# 📚 RESSOURCES
-# ═══════════════════════════════════════════════════════════════════════════
-#
-# - Unified Alerting : https://grafana.com/docs/grafana/latest/alerting/
-# - Provisioning : https://grafana.com/docs/grafana/latest/alerting/set-up/provision-alerting-resources/
-# - Query expressions : https://grafana.com/docs/grafana/latest/panels-visualizations/query-transform-data/expression-queries/
-# - PromQL functions : https://prometheus.io/docs/prometheus/latest/querying/functions/
-#
-# ═══════════════════════════════════════════════════════════════════════════
+      # ═══════════════════════════════════════════════════════════════════════
+      # ⚠️ ALERTE 3 : Feedback négatifs (WARNING)
+      # ═══════════════════════════════════════════════════════════════════════
+      - uid: cv-high-negative-feedback
+        title: High Negative Feedback Rate
+        condition: C
+        intervalSeconds: 30
+        data:
+          - refId: A
+            queryType: ''
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr: sum(rate(cv_user_feedback_total{feedback="0"}[5m])) / sum(rate(cv_user_feedback_total[5m]))
+              instant: true
+              range: false
+              refId: A
+          
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0.5  # 50%
+                    type: gt
+                  reducer:
+                    type: last
+                  type: query
+              expression: A
+              type: threshold
+        
+        noDataState: OK
+        execErrState: Alerting  # Alerte si pas de données (peut indiquer un problème)
+        for: 10m  # Pendant 10 minutes
+        annotations:
+          description: "Le taux de feedback négatif dépasse 50% depuis 10 minutes. Vérifier la qualité des inférences et l'expérience utilisateur."
+          summary: "Taux élevé de feedbacks négatifs (> 50%)"
+        labels:
+          severity: critical  # Plus grave que warning
+          component: feedback
+        isPaused: false

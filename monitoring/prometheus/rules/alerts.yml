@@ -53,6 +53,16 @@ groups:
         annotations:
           summary: "Latence élevée détectée"
           description: "Latence moyenne > 2s pendant 2 minutes"
+      # ═══════════════════════════════════════════════════════════════════════
+      - alert: NegativeFeedbackRatioHigh
+        expr: (sum by () (rate(cv_user_feedback_total{feedback="0"}[10m])) / sum by () (rate(cv_user_feedback_total[10m]))) * 100 > 50
+        for: 10m
+        labels:
+          severity: critical
+          type: feedback
+        annotations:
+          summary: "Ratio de feedback négatif élevé"
+          description: "Le ratio de feedback négatif est supérieur à 50% sur les 10 dernières minutes."
           
       - alert: DatabaseDisconnected
         expr: cv_database_connected == 0
