@@ -575,18 +575,6 @@ async def health_check(db: Session = Depends(get_db)):
     """
     Vérification de l'état de l'API et de la base de données
     
-    🎯 USAGE
-    - Healthcheck Docker (HEALTHCHECK curl /health)
-    - Monitoring externe (Uptime Robot, Datadog)
-    - Load balancer health checks
-    - CI/CD smoke tests post-déploiement
-    
-    🔍 VÉRIFICATIONS
-    - Modèle chargé en mémoire
-    - Connexion PostgreSQL active
-    - 🆕 V3 : Alerte Discord si DB down
-    - 🆕 V3 : Update Prometheus gauge database_status
-    
     Returns:
         JSON avec statut "healthy" ou "degraded"
     """
@@ -647,37 +635,3 @@ async def health_check(db: Session = Depends(get_db)):
     # 💡 STATUS CODES
     # 200 OK : retourné même si degraded (service répond)
     # Alternative : 503 si database down (force retry par LB)
-
-# ═══════════════════════════════════════════════════════════════════════════
-# 🎓 PATTERNS ARCHITECTURAUX ILLUSTRÉS
-# ═══════════════════════════════════════════════════════════════════════════
-#
-# 1. DEPENDENCY INJECTION (FastAPI Depends)
-#    Avantages :
-#    - Testabilité : mock db/token facilement
-#    - Réutilisabilité : get_db partagé entre tous endpoints
-#    - Gestion lifecycle : connexion DB fermée auto
-#
-# 2. SEPARATION OF CONCERNS
-#    routes.py : orchestration HTTP
-#    predictor.py : logique ML
-#    feedback_service.py : logique métier DB
-#    → Chaque module a 1 responsabilité claire
-#
-# 3. GRACEFUL DEGRADATION
-#    Prometheus/Discord absents → app fonctionne quand même
-#    DB down → healthcheck "degraded" mais API up
-#    → Résilience par design
-#
-# 4. OBSERVABILITY LAYERS
-#    - Logs : print() (remplacer par logging en prod)
-#    - Metrics : Prometheus (agrégées, queryable)
-#    - Alerting : Discord (incidents critiques)
-#    - Tracing : (absent, ajout possible avec OpenTelemetry)
-#
-# 5. BACKWARD COMPATIBILITY
-#    V3 = superset de V2 (aucun endpoint supprimé)
-#    Nouveaux params optionnels (ENABLE_*)
-#    → Migration progressive sans breaking change
-#
-# ═══════════════════════════════════════════════════════════════════════════

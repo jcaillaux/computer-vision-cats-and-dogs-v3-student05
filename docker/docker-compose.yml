@@ -28,7 +28,7 @@ services:
     
     healthcheck:
       
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-cats_dogs_db}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}_${STUDENT_ID} -h localhost -p 5432"]
 
       interval: 10s
 
