@@ -10,7 +10,7 @@ from sqlalchemy import create_engine, text, inspect
 ROOT_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 
-from config.settings import DB_URL, DB_NAME, DB_TABLE_MONITORING
+from config.settings import DB_URL, DB_NAME, DB_TABLE_MONITORING, DB_STUDENT
 
 def test_database_connection():
     """Test de connexion à la base de données cats_dogs_db"""
@@ -26,7 +26,7 @@ def test_database_connection():
             # Vérification du nom de la base de données
             result = connection.execute(text("SELECT current_database()"))
             db_name = result.fetchone()[0]
-            assert db_name == DB_NAME
+            assert db_name == f"{DB_NAME}_{DB_STUDENT}"
             
             print(f"\nConnexion réussie à la base: {db_name}")
             

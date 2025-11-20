@@ -14,7 +14,7 @@ sys.path.insert(0, str(ROOT_DIR))
 from config.settings import DATA_DIR, API_CONFIG
 
 # Configuration globale des tests
-BASE_URL = "http://localhost:8000"
+BASE_URL = f"http://{API_CONFIG['host']}:{API_CONFIG['port']+5}"
 TOKEN = API_CONFIG["token"]
 TEST_IMAGE_PATH = None
 
@@ -93,7 +93,7 @@ class TestAPIEndpoints:
         data = response.json()
         assert "model_loaded" in data
         assert "version" in data
-        assert data["version"] == "1.0.0"
+        assert data["version"] == "3.0.0"
 
 class TestAuthentication:
     """Tests d'authentification"""

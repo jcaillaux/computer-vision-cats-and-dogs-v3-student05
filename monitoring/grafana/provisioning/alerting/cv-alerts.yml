@@ -87,7 +87,7 @@ groups:
         
         noDataState: OK
         execErrState: Error
-        for: 1m
+        for: 10m
         annotations:
           description: "La latence moyenne d'inférence dépasse 2 secondes depuis 2 minutes. Vérifier charge CPU/GPU et modèle."
           summary: "Latence d'inférence élevée (> 2s)"
@@ -136,6 +136,186 @@ groups:
         annotations:
           description: "Le taux de feedback négatif dépasse 50% depuis 10 minutes. Vérifier la qualité des inférences et l'expérience utilisateur."
           summary: "Taux élevé de feedbacks négatifs (> 50%)"
+        labels:
+          severity: critical  # Plus grave que warning
+          component: feedback
+        isPaused: false
+      # ═══════════════════════════════════════════════════════════════════════
+      # ⚠️ ALERTE 4 : Confiance des prédiction trop basse (WARNING)
+      # ═══════════════════════════════════════════════════════════════════════
+      - uid: cv-low-prediction-confidence
+        title: Low Prediction Confidence Rate
+        condition: C
+        intervalSeconds: 30
+        data:
+          - refId: A
+            queryType: ''
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr: sum(rate(cv_prediction_confidence_bucket{le="60.0"}[1h]))/sum(rate(cv_prediction_confidence_count[1h]))
+              instant: true
+              range: false
+              refId: A
+          
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0.8  # 80%
+                    type: gt
+                  reducer:
+                    type: last
+                  type: query
+              expression: A
+              type: threshold
+        
+        noDataState: OK
+        execErrState: Alerting  # Alerte si pas de données (peut indiquer un problème)
+        for: 10m  # Pendant 10 minutes
+        annotations:
+          description: "Le taux de prédiction avec une confiance inférieure à 60% depuis 10 minutes. Vérifier la qualité des inférences et l'expérience utilisateur."
+          summary: "Taux prédictions avec une confiance < 60% trop élevé."
+        labels:
+          severity: warning  # Plus grave que warning
+          component: feedback
+        isPaused: false
+      # ═══════════════════════════════════════════════════════════════════════
+      # ⚠️ ALERTE 5 : Taux de requêtes top élevé (CRITICAL)
+      # ═══════════════════════════════════════════════════════════════════════
+      - uid: cv-too-many-requests
+        title: Too many requests
+        condition: C
+        intervalSeconds: 30
+        data:
+          - refId: A
+            queryType: ''
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr: sum(increase(http_requests_total{handler!~"/metrics|/health|none"}[1h]))
+              instant: true
+              range: false
+              refId: A
+          
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 10000  # 50%
+                    type: gt
+                  reducer:
+                    type: last
+                  type: query
+              expression: A
+              type: threshold
+        
+        noDataState: OK
+        execErrState: Alerting  # Alerte si pas de données (peut indiquer un problème)
+        for: 1m  # Pendant 10 minutes
+        annotations:
+          description: "Le nombre de requêtes par heure est trop élevé. Vérifier les logs systèmes."
+          summary: "Le service reçoit plus de 10 000 requêtes par heure."
+        labels:
+          severity: critical  # Plus grave que warning
+          component: feedback
+        isPaused: false
+      # ═══════════════════════════════════════════════════════════════════════
+      # ⚠️ ALERTE 6 : Taux de requêtes top élevé (CRITICAL)
+      # ═══════════════════════════════════════════════════════════════════════
+      - uid: cv-too-many-requests
+        title: Too many requests
+        condition: C
+        intervalSeconds: 30
+        data:
+          - refId: A
+            queryType: ''
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr: sum(increase(http_requests_total{handler!~"/metrics|/health|none"}[1h]))
+              instant: true
+              range: false
+              refId: A
+          
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 10000  # 50%
+                    type: gt
+                  reducer:
+                    type: last
+                  type: query
+              expression: A
+              type: threshold
+        
+        noDataState: OK
+        execErrState: Alerting  # Alerte si pas de données (peut indiquer un problème)
+        for: 1m  # Pendant 10 minutes
+        annotations:
+          description: "Le nombre de requêtes par heure est trop élevé. Vérifier les logs systèmes."
+          summary: "Le service reçoit plus de 10 000 requêtes par heure."
+        labels:
+          severity: critical  # Plus grave que warning
+          component: feedback
+        isPaused: false
+      # ═══════════════════════════════════════════════════════════════════════
+      # ⚠️ ALERTE 7 : Modèle potentiellement biaisé (CRITICAL)
+      # ═══════════════════════════════════════════════════════════════════════
+      - uid: cv-biased-model-detected
+        title: La répartition des cibles prédites est biasée
+        condition: C
+        intervalSeconds: 30
+        data:
+          - refId: A
+            queryType: ''
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr: sum by (target) (increase(cv_predicted_target_total[1h])) / scalar(sum(increase(cv_predicted_target_total[1h])))
+              instant: true
+              range: false
+              refId: A
+          
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0.8  # 80%
+                    type: gt
+                  reducer:
+                    type: last
+                  type: query
+              expression: A
+              type: threshold
+        
+        noDataState: OK
+        execErrState: Alerting  # Alerte si pas de données (peut indiquer un problème)
+        for: 1m  # Pendant 10 minutes
+        annotations:
+          description: "Le taux de la cible majoritaire dépasse 80%. Vérifier un potentiel biais du modèle."
+          summary: "Le service prédit une seule classe majoritairement (> 80%)."
         labels:
           severity: critical  # Plus grave que warning
           component: feedback

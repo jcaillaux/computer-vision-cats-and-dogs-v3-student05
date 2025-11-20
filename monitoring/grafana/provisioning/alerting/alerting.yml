@@ -1,22 +1,3 @@
-# ═══════════════════════════════════════════════════════════════════════════════
-# 🔔 GRAFANA ALERTING PROVISIONING - Configuration automatique
-# ═══════════════════════════════════════════════════════════════════════════════
-#
-# 🎯 OBJECTIF
-# Fichier de provisioning Grafana pour activer le système d'alerting.
-# En V3, ce fichier est minimal car alertes configurées via l'UI Grafana.
-#
-# 📚 CONCEPTS CLÉS
-# - Provisioning : configuration as code (vs clics manuels dans UI)
-# - Unified Alerting : système moderne Grafana (remplace legacy alerting)
-# - Contact points : canaux de notification (Discord, Slack, Email)
-# - Notification policies : routage des alertes vers contact points
-#
-# 🔗 ARCHITECTURE ALERTING GRAFANA
-# Alert Rule (dashboard/query) → Evaluation → Contact Point → Discord/Email/PagerDuty
-#
-# ═══════════════════════════════════════════════════════════════════════════════
-
 apiVersion: 1
 # 📌 Version du format de provisioning Grafana
 # apiVersion: 1 = format actuel (stable depuis Grafana 8+)
