@@ -8,17 +8,10 @@ from pathlib import Path
 import time
 import os
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 📂 CONFIGURATION PATHS
-# ─────────────────────────────────────────────────────────────────────────────
 ROOT_DIR = Path(__file__).parent.parent.parent
 # 📁 Remonte de 3 niveaux : routes.py → api/ → src/ → racine
 sys.path.insert(0, str(ROOT_DIR))
-# 🔧 Ajoute racine au PYTHONPATH (permet imports absolus depuis src/)
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 📦 IMPORTS CORE (toujours actifs, V2 conservée)
-# ─────────────────────────────────────────────────────────────────────────────
 from .auth import verify_token  # 🔐 Authentification JWT/Bearer
 from src.models.predictor import CatDogPredictor  # 🧠 Modèle CNN
 
@@ -29,19 +22,6 @@ from src.database.feedback_service import FeedbackService  # 📊 CRUD feedbacks
 # Monitoring V2 (Plotly dashboards - conservé)
 from src.monitoring.dashboard_service import DashboardService  # 📈 Graphiques Plotly
 
-# ═══════════════════════════════════════════════════════════════════════════
-# 🆕 V3 - CONDITIONAL IMPORTS (activation optionnelle)
-# ═══════════════════════════════════════════════════════════════════════════
-# 💡 STRATÉGIE DE COMPATIBILITÉ
-# Les fonctionnalités V3 (Prometheus, Discord) sont OPTIONNELLES :
-# - Si désactivées → app fonctionne comme en V2 (aucun impact)
-# - Si activées → ajoutent métriques et alertes en plus
-# 
-# AVANTAGES
-# ✅ Déploiement incrémental (tester V3 sans tout casser)
-# ✅ Rollback facile (désactiver via .env si problème)
-# ✅ Environnements différents (Prometheus en prod, pas en dev)
-
 ENABLE_PROMETHEUS = os.getenv('ENABLE_PROMETHEUS', 'false').lower() == 'true'
 # 📊 Flag activation Prometheus (lu depuis .env)
 # Défaut : false (cohérent avec principe opt-in)
@@ -50,15 +30,6 @@ ENABLE_DISCORD = os.getenv('DISCORD_WEBHOOK_URL') is not None
 # 📢 Flag activation Discord (présence du webhook suffit)
 # Logique : si URL fournie → intention d'utiliser Discord
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 🔄 DÉCLARATION VARIABLES GLOBALES (évite NameError si imports échouent)
-# ─────────────────────────────────────────────────────────────────────────────
-# 💡 PATTERN : Initialiser à None puis assigner conditionnellement
-# Alternative : wrapper dans try/except à chaque usage (plus verbeux)
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 📊 IMPORT PROMETHEUS (si activé)
-# ─────────────────────────────────────────────────────────────────────────────
 if ENABLE_PROMETHEUS:
     try:
         from src.monitoring.prometheus_metrics import (

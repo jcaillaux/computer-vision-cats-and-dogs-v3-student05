@@ -8,9 +8,8 @@ dependencies = [
     "fastapi>=0.121.2",
     "httpx>=0.28.1",
     "jinja2>=3.1.6",
-    "keras>=3.12.0",
     "matplotlib>=3.10.7",
-    "numpy>=2.2.6",
+    "numpy==2.1",
     "pandas>=2.3.3",
     "pillow>=12.0.0",
     "plotly>=6.4.0",
@@ -21,31 +20,25 @@ dependencies = [
     "python-multipart>=0.0.20",
     "requests>=2.32.5",
     "sqlalchemy>=2.0.44",
-    "tensorflow>=2.20.0",
     "uvicorn>=0.38.0",
 ]
 
 [dependency-groups]
 monitoring = [
     "discord-webhook>=1.4.1",
-    "fastapi>=0.121.2",
-    "httpx>=0.28.1",
-    "jinja2>=3.1.6",
-    "keras>=3.12.0",
-    "matplotlib>=3.10.7",
-    "numpy>=2.2.6",
-    "pandas>=2.3.3",
-    "pillow>=12.0.0",
-    "plotly>=6.4.0",
     "prometheus-client>=0.23.1",
     "prometheus-fastapi-instrumentator>=7.1.0",
-    "psycopg2-binary>=2.9.11",
-    "pydantic>=2.12.4",
-    "pytest>=9.0.1",
-    "python-dotenv>=1.2.1",
-    "python-multipart>=0.0.20",
-    "requests>=2.32.5",
-    "sqlalchemy>=2.0.44",
-    "tensorflow>=2.20.0",
-    "uvicorn>=0.38.0",
+]
+inference = [
+    "onnxruntime>=1.16.1",
+]
+training = [
+    "keras>=3.12.0",
+    "tensorflow==2.19.0",
+    "tf2onnx>=1.16.1",
+]
+
+production = [
+    {include-group = "monitoring"},
+    {include-group = "inference"}
 ]

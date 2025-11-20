@@ -9,7 +9,7 @@ COPY pyproject.toml uv.lock ./
 
 ENV UV_PROJECT_ENVIRONMENT="/opt/venv"
 
-RUN uv sync --frozen --all-groups
+RUN uv sync --frozen --group production
 
 FROM python:3.11-slim
 
