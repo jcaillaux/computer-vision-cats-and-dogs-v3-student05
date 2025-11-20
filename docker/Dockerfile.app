@@ -5,17 +5,10 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 WORKDIR /app
 
-# Copier UNIQUEMENT les requirements (layer cache optimal)
-#COPY requirements/base.txt requirements/prod.txt requirements/monitoring.txt ./
 COPY pyproject.toml uv.lock ./
-# Créer venv et installer dépendances
-#RUN uv venv /opt/venv
-#ENV PATH="/opt/venv/bin:$PATH"
+
 ENV UV_PROJECT_ENVIRONMENT="/opt/venv"
-#RUN uv pip install \
-#    -r base.txt \
-#    -r prod.txt \
-#    -r monitoring.txt
+
 RUN uv sync --frozen --all-groups
 
 FROM python:3.11-slim
