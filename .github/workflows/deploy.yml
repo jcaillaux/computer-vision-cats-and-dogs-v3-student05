@@ -33,7 +33,10 @@ jobs:
         # Même si on re-clone sur le VPS, utile pour :
         # - Futurs steps de tests (pytest, linting)
         # - Build d'images Docker en local avant push registry
-
+      - name: Perform tests
+        run: |
+          uv sync --frozen --all-groups
+          pytest tests/ -v
       # ───────────────────────────────────────────────────────────────────────
       # ÉTAPE 2 : Configuration SSH
       # ───────────────────────────────────────────────────────────────────────
@@ -55,18 +58,6 @@ jobs:
           # 🛡️ Ajoute la clé publique du serveur (évite prompt "Are you sure?")
           # -H : hash du hostname (sécurité supplémentaire)
           # Alternative : ajouter manuellement la fingerprint du serveur
-        
-        # 🔐 SÉCURITÉ : SECRETS GITHUB
-        # Configuration : Settings → Secrets and variables → Actions
-        # Secrets requis :
-        #   - SSH_PRIVATE_KEY : clé privée ED25519 (publique sur VPS)
-        #   - VPS_HOST : IP ou domaine (ex: 51.178.42.69 ou app.monvps.com)
-        #   - VPS_USER : utilisateur SSH (ex: ubuntu, debian, deploy)
-        #   - GH_TOKEN : Personal Access Token pour clone privé (si repo privé)
-
-      # ───────────────────────────────────────────────────────────────────────
-      # ÉTAPE 3 : Déploiement sur le VPS
-      # ───────────────────────────────────────────────────────────────────────
       - name: 📦 Deploy to VPS
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
