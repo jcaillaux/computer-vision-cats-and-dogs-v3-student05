@@ -5,17 +5,25 @@ import numpy as np
 from PIL import Image
 import io
 from onnxruntime import InferenceSession
+import json
 
 # Ajouter les chemins nécessaires
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from config.settings import MODEL_CONFIG, API_CONFIG
 
+def count_params(config) -> int:
+    """Compter le nombre de paramètres dans le modèle ONNX"""
+    
+    with open(config, 'r') as f:
+        params = json.load(f)
+    return params.get("n_parameters", 0)
 class CatDogPredictor:
     def __init__(self):
         self.image_size = MODEL_CONFIG["image_size"]
         self.model_path = API_CONFIG["onnx_path"]
         self.model = None
         self.load_model()
+        self.n_params = count_params(API_CONFIG["n_params"]) if self.model is not None else 0
     
     def load_model(self):
         """Chargement du modèle"""

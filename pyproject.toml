@@ -10,7 +10,6 @@ dependencies = [
     "jinja2>=3.1.6",
     "matplotlib>=3.10.7",
     "numpy==2.1",
-    "pandas>=2.3.3",
     "pillow>=12.0.0",
     "plotly>=6.4.0",
     "psycopg2-binary>=2.9.11",
@@ -36,6 +35,8 @@ training = [
     "keras>=3.12.0",
     "tensorflow==2.19.0",
     "tf2onnx>=1.16.1",
+    "pandas>=2.3.3",
+    "onnx>=1.16.0"
 ]
 
 production = [

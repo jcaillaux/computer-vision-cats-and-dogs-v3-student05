@@ -116,7 +116,7 @@ async def info_page(request: Request):
         "name": "Cats vs Dogs Classifier",
         "version": "3.0.0",  # 🆕 V3
         "description": "Modèle CNN pour classification chats/chiens",
-        "parameters": predictor.model.count_params() if predictor.is_loaded() else 0,
+        "parameters": predictor.n_params if predictor.is_loaded() else 0,
         # 📊 Nombre de paramètres (ex: ~23M pour VGG16 fine-tuned)
         "classes": ["Cat", "Dog"],
         "input_size": f"{predictor.image_size[0]}x{predictor.image_size[1]}",

@@ -49,8 +49,9 @@ API_CONFIG = {
     "host": "0.0.0.0", #"127.0.0.1",
     "port": 8000,
     "token": API_TOKEN,
-    #"model_path": MODELS_DIR / "cats_dogs_model.keras",
-    "onnx_path": MODELS_DIR / "cats_dogs_model.onnx",
+    "model_path": MODELS_DIR / "cats_dogs_model.keras",
+    "onnx_path": MODELS_DIR /"onnx" / "cats_dogs_model.onnx",
+    "n_params" :MODELS_DIR / "onnx"/ "model_params.json"
 }
 
 # URLs de données

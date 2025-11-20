@@ -75,7 +75,7 @@ services:
 
       - ../data:/app/data:ro
 
-      - ../models/onnx:/app/models:ro
+      - ../models:/app/models:ro
 
     depends_on:
       postgres:

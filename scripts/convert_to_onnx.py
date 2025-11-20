@@ -1,6 +1,6 @@
 import tensorflow as tf
 import tf2onnx
-from pathlib import Path
+import json
 
 from config.settings import API_CONFIG, MODEL_CONFIG
 
@@ -15,6 +15,8 @@ spec = (tf.TensorSpec((None, *image_size, 3), tf.float32, name="input"),)
 
 # Convertir en ONNX
 output_path = model_path.parent/ 'onnx' / "cats_dogs_model.onnx"
+n_params_path = output_path.parent / "model_params.json"
+
 model_proto, _ = tf2onnx.convert.from_keras(
     model,
     input_signature=spec,
@@ -22,4 +24,6 @@ model_proto, _ = tf2onnx.convert.from_keras(
     output_path=output_path
 )
 
-print(f"✅ Modèle converti: {output_path}")
+print(f"Modèle converti: {output_path}")
+with open(n_params_path, 'w') as f:
+    json.dump({"n_parameters": model.count_params()}, f)

@@ -186,7 +186,6 @@ dependencies = [
     { name = "jinja2" },
     { name = "matplotlib" },
     { name = "numpy" },
-    { name = "pandas" },
     { name = "pillow" },
     { name = "plotly" },
     { name = "psycopg2-binary" },
@@ -216,6 +215,8 @@ production = [
 ]
 training = [
     { name = "keras" },
+    { name = "onnx" },
+    { name = "pandas" },
     { name = "tensorflow" },
     { name = "tf2onnx" },
 ]
@@ -227,7 +228,6 @@ requires-dist = [
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "matplotlib", specifier = ">=3.10.7" },
     { name = "numpy", specifier = "==2.1" },
-    { name = "pandas", specifier = ">=2.3.3" },
     { name = "pillow", specifier = ">=12.0.0" },
     { name = "plotly", specifier = ">=6.4.0" },
     { name = "psycopg2-binary", specifier = ">=2.9.11" },
@@ -255,6 +255,8 @@ production = [
 ]
 training = [
     { name = "keras", specifier = ">=3.12.0" },
+    { name = "onnx", specifier = ">=1.16.0" },
+    { name = "pandas", specifier = ">=2.3.3" },
     { name = "tensorflow", specifier = "==2.19.0" },
     { name = "tf2onnx", specifier = ">=1.16.1" },
 ]
