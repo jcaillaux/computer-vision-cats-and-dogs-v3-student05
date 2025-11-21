@@ -225,7 +225,7 @@ groups:
         for: 1m  # Pendant 10 minutes
         annotations:
           description: "Le nombre de requêtes par heure est trop élevé. Vérifier les logs systèmes."
-          summary: "Le service reçoit plus de 10 000 requêtes par heure."
+          summary: "Le service reçoit plus de 50 000 requêtes par heure."
         labels:
           severity: critical  # Plus grave que warning
           component: feedback
